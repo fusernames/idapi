@@ -2,6 +2,8 @@
 
 Node.js mongoose &amp; express framework to build fast api models and routes
 
+## Get started
+
 ```js
 const idapi = require('idapi')
 const jwt = require('jsonwebtoken')
