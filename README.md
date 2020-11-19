@@ -1,6 +1,6 @@
 # idapi
 
-Node.js mongoose &amp; express framework to build fast api models and routes
+Node.js mongoose &amp; express framework to build fast api models and routes created by [https://industrie-digitale.fr](https://industrie-digitale.fr)
 
 ## Get started
 
