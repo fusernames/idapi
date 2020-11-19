@@ -99,7 +99,7 @@ const server = async () => {
     },
     $update: {
       access: 'admin',
-      before: (ctx) => (ctx.req.body.password = undefined),
+      before: (ctx) => (ctx.req.body.password = undefined), // before and after middlewares are available for every routes
     },
     $delete: {
       access: 'admin',

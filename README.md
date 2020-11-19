@@ -10,12 +10,14 @@ const jwt = require('jsonwebtoken')
 
 const server = async () => {
   // connect express app and mongo database
+
   await idapi.init({
     uri: '<yourUri>',
     port: 5000,
   })
 
   // adding a custom middleware to parse the user token
+
   idapi.app.use((req, res, next) => {
     let token = req.cookies.Authorization || req.headers.authorization
     if (token) {
@@ -27,6 +29,7 @@ const server = async () => {
   })
 
   // creating our authorizations functions (for routes)
+
   idapi.authorizations = {
     public: async () => true, // we have to return true if access is granted and false if not
     private: async (ctx) => Boolean(ctx.req.myId),
@@ -39,6 +42,7 @@ const server = async () => {
   }
 
   // adding a model "User" with mongoose, check mongoose schema for the second argument
+
   const userSchema = idapi.schema('User', {
     email: {
       type: String,
@@ -65,6 +69,7 @@ const server = async () => {
   })
 
   // the userSchema is a mongoose schema instance
+
   userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()
     this.password = await bcrypt.hash(this.password, 8)
@@ -72,6 +77,7 @@ const server = async () => {
   })
 
   // adding a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
+
   idapi.validator('User', {
     email: (Joi) =>
       Joi.string()
@@ -83,9 +89,11 @@ const server = async () => {
   })
 
   // create our mongoose model (important: don't do it before the validator)
+
   idapi.model('User')
 
   // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
+
   idapi.routes('User', {
     $create: {
       access: 'public', // refering to our authorizations.public function
@@ -101,7 +109,7 @@ const server = async () => {
     },
     $update: {
       access: 'admin',
-      before: (ctx) => (ctx.req.body.password = undefined),
+      before: (ctx) => (ctx.req.body.password = undefined), // before and after middlewares are available for every routes
     },
     $delete: {
       access: 'admin',
