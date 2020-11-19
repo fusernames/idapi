@@ -9,11 +9,13 @@ const idapi = require('idapi')
 const jwt = require('jsonwebtoken')
 
 const server = async () => {
+  // connect express app and mongo database
   await idapi.init({
-    uri: `mongodb+srv://remote:HnljTZq6hWdJzbxe@cluster0.fk2na.mongodb.net/idvisor?retryWrites=true&w=majority`,
+    uri: '<yourUri>',
     port: 5000,
   })
 
+  // adding a custom middleware to parse the user token
   idapi.app.use((req, res, next) => {
     let token = req.cookies.Authorization || req.headers.authorization
     if (token) {
@@ -24,8 +26,9 @@ const server = async () => {
     next()
   })
 
+  // creating our authorizations functions (for routes)
   idapi.authorizations = {
-    public: async () => true,
+    public: async () => true, // we have to return true if access is granted and false if not
     private: async (ctx) => Boolean(ctx.req.myId),
     admin: async (ctx) => {
       if (!ctx.req.myId) return false
@@ -35,6 +38,7 @@ const server = async () => {
     },
   }
 
+  // adding a model "User" with mongoose, check mongoose schema for the second argument
   const userSchema = idapi.schema('User', {
     email: {
       type: String,
@@ -60,12 +64,14 @@ const server = async () => {
     },
   })
 
+  // the userSchema is a mongoose schema instance
   userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()
     this.password = await bcrypt.hash(this.password, 8)
     next()
   })
 
+  // adding a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
   idapi.validator('User', {
     email: (Joi) =>
       Joi.string()
@@ -76,11 +82,13 @@ const server = async () => {
     role: (Joi) => Joi.string().valid('admin', 'user').required(),
   })
 
+  // create our mongoose model (important: don't do it before the validator)
   idapi.model('User')
 
+  // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
   idapi.routes('User', {
     $create: {
-      access: 'public',
+      access: 'public', // refering to our authorizations.public function
     },
     $getMany: {
       access: 'public',
@@ -103,8 +111,8 @@ const server = async () => {
       access: 'private',
       resolver: async (ctx) => {
         const user = await Model.findOne({ _id: ctx.req.myId })
-        if (!user) throw { status: 404, code: 'Utilisateur introuvable' }
-        return user
+        if (!user) throw { status: 404, code: 'Utilisateur introuvable' } // send the response with status as status and code as content
+        return user // the returning value is sent in json with status code 200
       },
     },
     '/user/token': {
