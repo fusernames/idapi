@@ -1,0 +1,42 @@
+{
+  "name": "idapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "mongoose": "^5.10.15",
+    "express": "^4.17.1",
+    "joi": "^17.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "cookie-parser": "^1.4.5",
+    "lodash": "^4.17.15",
+    "pluralize": "^8.0.0",
+    "body-parser": "^1.19.0",
+    "chalk": "^3.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mongoose",
+    "fast",
+    "api",
+    "mongodb",
+    "express",
+    "joi",
+    "validation",
+    "routes",
+    "generation",
+    "generator"
+  ],
+  "author": "shellstrom",
+  "license": "ISC"
+}
