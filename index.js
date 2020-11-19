@@ -2,20 +2,20 @@ const connectMongoose = require('./mongoose/connectMongoose')
 const connectExpress = require('./express/connectExpress')
 const generateRoutes = require('./utils/generateRoutes')
 const Validator = require('./utils/Validator')
-const Joi = require('joi')
 
 class Idapi {
   authorizations = {}
-  Joi = Joi
 
-  // constructor() {
-  //   this.Joi = Joi
-  // }
+  constructor() {
+    // this.Joi = Joi
+    console.log('Idapi new intance')
+  }
 
   async init({ uri, port }) {
     this.uri = uri
     this.mongoose = await connectMongoose(uri)
     this.app = connectExpress(port)
+    console.log(this.app)
   }
 
   schema(name, schema, options) {
@@ -50,6 +50,4 @@ class Idapi {
   }
 }
 
-const idapi = new Idapi()
-
-module.exports = idapi
+module.exports = new Idapi()

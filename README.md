@@ -118,8 +118,8 @@ const server = async () => {
     '/user/token': {
       method: 'get',
       access: 'public',
-      resolver: async ({ data }) => {
-        const token = await generateToken(data)
+      resolver: async (ctx) => {
+        const token = await generateToken(ctx.req.query)
         return token
       },
     },
