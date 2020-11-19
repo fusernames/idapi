@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken')
 const server = async () => {
   // connect express app and mongo database
   await idapi.init({
-    uri: `mongodb+srv://remote:HnljTZq6hWdJzbxe@cluster0.fk2na.mongodb.net/idvisor?retryWrites=true&w=majority`,
+    uri: `your uri`,
     port: 5000,
   })
 
