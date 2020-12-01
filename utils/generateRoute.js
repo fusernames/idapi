@@ -1,10 +1,10 @@
 const pluralize = require('pluralize')
 const respond = require('./respond')
-const parseQuery = require('./parseQuery')
+const queryParser = require('./queryParser')
 const router = require('express').Router()
 const mongoose = require('mongoose')
 
-module.exports = ({
+module.exports = function ({
   route,
   modelName,
   before,
@@ -15,7 +15,8 @@ module.exports = ({
   resolver,
   disableRespond,
   authorizations,
-}) => {
+  idapi,
+}) {
   const lowercaseName = modelName.toLowerCase()
   const wrapperArgs = {
     access,
@@ -27,7 +28,22 @@ module.exports = ({
     authorizations,
   }
   switch (route) {
-    case '$create':
+    case '$validate':
+      router.post(`/${lowercaseName}/validate`, (req, res) => {
+        routeWrapper({
+          ...wrapperArgs,
+          req,
+          res,
+          resolver: async ({ Model, req }) => {
+            const errors = idapi.validators[modelName].validateForm(req.body)
+            console.dir(errors)
+            if (errors) return errors
+            else return {}
+          },
+        })
+      })
+      break
+    case '$post':
       router.post(`/${lowercaseName}`, (req, res) => {
         routeWrapper({
           ...wrapperArgs,
@@ -47,7 +63,7 @@ module.exports = ({
           req,
           res,
           resolver: async ({ Model }) => {
-            const { where, sort, limit, skip, page, isFullList } = parseQuery(req.query)
+            const { where, sort, limit, skip, page, full } = queryParser(req.query)
             let mainQuery = Model.find(where).skip(skip).limit(limit).sort(sort)
             if (queryMiddleware) {
               await queryMiddleware(mainQuery)
@@ -58,7 +74,7 @@ module.exports = ({
               count,
               pages: Math.ceil(count / limit),
               page,
-              isFullList,
+              full,
             }
           },
         })
@@ -66,13 +82,17 @@ module.exports = ({
       break
     case '$get':
       router.get(`/${lowercaseName}`, (req, res) => {
-        const { where } = parseQuery(req.query)
+        const { where } = queryParser(req.query)
         routeWrapper({
           ...wrapperArgs,
           req,
           res,
           resolver: async ({ Model }) => {
-            const result = await Model.findOne(where)
+            let mainQuery = Model.findOne(where)
+            if (queryMiddleware) {
+              await queryMiddleware(mainQuery)
+            }
+            const result = await mainQuery.exec()
             if (!result) throw { status: 404, code: `La ressource n'existe pas` }
             return result
           },

@@ -30,7 +30,7 @@ const server = async () => {
     private: async (ctx) => Boolean(ctx.req.myId),
     admin: async (ctx) => {
       if (!ctx.req.myId) return false
-      const user = await idapi.User.model.findOne({ _id: ctx.req.id, role: 'admin' })
+      const user = await idapi.User.findOne({ _id: ctx.req.id, role: 'admin' })
       if (!user) return false
       return true
     },
@@ -107,7 +107,7 @@ const server = async () => {
     '/user/current': {
       method: 'get',
       access: 'private',
-      resolver: async (ctx) => {
+      resolver: async ({ Model }) => {
         const user = await Model.findOne({ _id: ctx.req.myId })
         if (!user) throw { status: 404, code: 'Utilisateur introuvable' } // send the response with status as status and code as content
         return user // the returning value is sent in json with status code 200

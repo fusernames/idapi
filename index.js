@@ -2,20 +2,19 @@ const connectMongoose = require('./mongoose/connectMongoose')
 const connectExpress = require('./express/connectExpress')
 const generateRoutes = require('./utils/generateRoutes')
 const Validator = require('./utils/Validator')
+const queryParser = require('./utils/queryParser')
 
 class Idapi {
   authorizations = {}
-
-  constructor() {
-    // this.Joi = Joi
-    console.log('Idapi new intance')
-  }
+  queryParser = queryParser
+  validators = {}
+  schemas = {}
 
   async init({ uri, port }) {
     this.uri = uri
     this.mongoose = await connectMongoose(uri)
     this.app = connectExpress(port)
-    console.log(this.app)
+    console.log('idapi app is connected !')
   }
 
   schema(name, schema, options) {
@@ -23,30 +22,34 @@ class Idapi {
       options = {
         timestamps: true,
       }
-    this[name] = {
-      mongooseSchema: this.mongoose.Schema(schema, options),
+    this.schemas = {
+      ...this.schemas,
+      [name]: this.mongoose.Schema(schema, options),
     }
-    return this[name].mongooseSchema
+    return this.schemas[name]
   }
 
   model(name) {
-    this[name].model = this.mongoose.model(name, this[name].mongooseSchema)
-    return this[name].model
+    this[name] = this.mongoose.model(name, this.schemas[name])
+    return this[name]
   }
 
-  validator(name, joiSchema) {
-    this[name].validator = new Validator(joiSchema)
-    if (this[name].mongooseSchema) {
-      this[name].mongooseSchema.pre('save', async function (next) {
-        this[name].validator.validateObject(this)
-        next()
+  validator(name, getJoiSchema) {
+    const validator = new Validator(getJoiSchema)
+    const schema = this.schemas[name]
+    this.validators[name] = validator
+    console.log(this.validators)
+    if (schema) {
+      schema.pre('validate', function () {
+        console.log('test')
+        validator.validateObject(this)
       })
     }
-    return this[name].validator
+    return this.validators[name]
   }
 
   routes(name, routes) {
-    this.app.use(generateRoutes(name, routes, this.authorizations))
+    this.app.use(generateRoutes(name, routes, this.authorizations, this))
   }
 }
 

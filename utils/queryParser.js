@@ -1,7 +1,7 @@
-module.exports = ({ _sort, _page, _limit, _fullList, ...rest }) => {
+module.exports = ({ _sort, _page, _limit, _full, ...rest }) => {
   let limit = _limit ? _limit : 8
   let page = _page ? _page : 1
-  if (_fullList) {
+  if (_full) {
     page = undefined
     limit = undefined
   }
@@ -11,7 +11,7 @@ module.exports = ({ _sort, _page, _limit, _fullList, ...rest }) => {
     limit,
     skip: limit * (page - 1),
     page: page ? parseInt(page) : undefined,
-    fullList: Boolean(_fullList),
+    full: Boolean(_full),
   }
   if (_sort) {
     let [field, value] = _sort.split(':')
@@ -25,9 +25,9 @@ module.exports = ({ _sort, _page, _limit, _fullList, ...rest }) => {
           ...result.where[field],
           [`$${operator}`]: value,
         }
-      } else {
-        result.where[field] = value
       }
+    } else {
+      result.where[key] = value
     }
   }
   return result
