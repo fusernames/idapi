@@ -5,7 +5,7 @@ module.exports = async (req, res, fn, options) => {
     if (!options.disableRespond) res.status(200).json(result)
   } catch (e) {
     console.log(e)
-    if (e.status) res.status(e.status).json(e.details || e.code)
+    if (e.status) res.status(e.status).json({ code: e.code, data: e.data })
     else res.status(400).json('Unhandled Error')
   }
 }

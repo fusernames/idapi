@@ -5,12 +5,18 @@ const Validator = require('./utils/Validator')
 const queryParser = require('./utils/queryParser')
 
 class Idapi {
-  authorizations = {}
-  queryParser = queryParser
-  validators = {}
-  schemas = {}
+  // constructor() {
+  //   this.authorizations = {}
+  //   this.queryParser = queryParser
+  //   this.validators = {}
+  //   this.schemas = {}
+  // }
 
   async init({ uri, port }) {
+    this.authorizations = {}
+    this.queryParser = queryParser
+    this.validators = {}
+    this.schemas = {}
     this.uri = uri
     this.mongoose = await connectMongoose(uri)
     this.app = connectExpress(port)

@@ -12,7 +12,7 @@ module.exports = class Validator {
       const res = this.joiSchema[key].messages(errorMessages).validate(object[key])
       if (res.error) errors[key] = res.error.details[0].message
     })
-    if (Object.keys(errors).length > 0) throw { status: 400, code: errors }
+    if (Object.keys(errors).length > 0) throw { status: 400, errors }
   }
 
   validateForm(form) {
