@@ -47,7 +47,11 @@ class Idapi {
     console.log(this.validators)
     if (schema) {
       schema.pre('validate', function () {
-        console.log('test')
+        console.log('[idapi] validation check - pre validate')
+        validator.validateObject(this)
+      })
+      schema.pre('save', function () {
+        console.log('[idapi] validation check - pre save')
         validator.validateObject(this)
       })
     }

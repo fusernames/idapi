@@ -36,7 +36,6 @@ module.exports = function ({
           res,
           resolver: async ({ Model, req }) => {
             const errors = idapi.validators[modelName].validateForm(req.body)
-            console.dir(errors)
             if (errors) return errors
             else return {}
           },
@@ -193,7 +192,7 @@ const routeWrapper = ({
       // resolver
       const result = await resolver({ Model, req, res })
       // after
-      if (after) await after({ Model, result })
+      if (after) await after({ Model, req, res, result })
       return result
     },
     { disableRespond }
