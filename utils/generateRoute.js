@@ -3,6 +3,7 @@ const respond = require('./respond')
 const queryParser = require('./queryParser')
 const router = require('express').Router()
 const mongoose = require('mongoose')
+const { string } = require('joi')
 
 module.exports = function ({
   route,
@@ -17,7 +18,7 @@ module.exports = function ({
   authorizations,
   idapi,
 }) {
-  const lowercaseName = modelName.toLowerCase()
+  const lowercaseName = modelName ? modelName.charAt(0).toLowerCase() + modelName.slice(1) : null
   const wrapperArgs = {
     access,
     before,

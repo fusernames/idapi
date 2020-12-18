@@ -13,7 +13,7 @@ module.exports = class Validator {
       if (res.error) errors[key] = res.error.details[0].message
     })
     if (Object.keys(errors).length > 0)
-      throw { status: 400, code: 'Erreurs lors de la creation', details: errors }
+      throw { status: 400, code: 'Erreur lors de la création', validation: errors }
   }
 
   validateForm(form) {
