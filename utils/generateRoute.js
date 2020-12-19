@@ -182,6 +182,7 @@ const routeWrapper = ({
     res,
     async () => {
       // access
+      // console.log(`[idapi] access ${access}, authorizations: ${authorizations[access]}`)
       if (access && authorizations[access]) {
         const accessGranted = await authorizations[access]({ access, req })
         if (!accessGranted) throw { status: 403, code: 'Unauthorized' }
