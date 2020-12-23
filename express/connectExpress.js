@@ -15,7 +15,7 @@ module.exports = function initServer(port) {
 
   // routes
   app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
+    console.log(`[idapi] Listening on port ${port}`)
   })
   return app
 }

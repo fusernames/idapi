@@ -1,16 +1,17 @@
 module.exports = ({ _sort, _page, _limit, _full, ...rest }) => {
-  let limit = _limit ? _limit : 8
-  let page = _page ? _page : 1
+  let limit = _limit ? parseInt(_limit) : 8
+  let page = _page ? parseInt(_page) : 1
+  if (limit > 199) limit = 199
   if (_full) {
-    page = undefined
-    limit = undefined
+    page = 1
+    limit = 199
   }
   let result = {
     sort: [['createdAt', -1]],
     where: {},
     limit,
+    page,
     skip: limit * (page - 1),
-    page: page ? parseInt(page) : undefined,
     full: Boolean(_full),
   }
   if (_sort) {

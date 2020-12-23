@@ -20,7 +20,7 @@ class Idapi {
     this.uri = uri
     this.mongoose = await connectMongoose(uri)
     this.app = connectExpress(port)
-    console.log('idapi app is connected !')
+    console.log('[idapi] idapi app is connected !')
   }
 
   schema(name, schema, options) {
@@ -44,7 +44,6 @@ class Idapi {
     const validator = new Validator(getJoiSchema)
     const schema = this.schemas[name]
     this.validators[name] = validator
-    console.log(this.validators)
     if (schema) {
       schema.pre('validate', function () {
         console.log('[idapi] validation check - pre validate')
