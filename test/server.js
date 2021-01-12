@@ -1,20 +1,16 @@
-// const { schemaComposer } = require('graphql-compose')
-// const graphqlHTTP = require('express-graphql')
-// const buildSchemas = require('./utils/buildSchemas')
-// const { ApolloServer } = require('apollo-server-express')
-
 const idapi = require('../')
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const server = async () => {
   // connect express app and mongo database
   await idapi.init({
-    uri: `mongodb+srv://remote:HnljTZq6hWdJzbxe@cluster0.fk2na.mongodb.net/idvisor?retryWrites=true&w=majority`,
+    uri: process.env.URI,
     port: 5000,
   })
 
   // adding a custom middleware to parse the user token
-  idapi.app.use((req, res, next) => {
+  idapi.app.use((req, res, next) => { // idapi.app is the express app
     let token = req.cookies.Authorization || req.headers.authorization
     if (token) {
       jwt.verify(token, 'secret', (err, decoded) => {
@@ -69,42 +65,47 @@ const server = async () => {
     next()
   })
 
-  // adding a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
-  idapi.validator('User', {
-    email: (Joi) =>
-      Joi.string()
+  // adding a validator for our model (validation is used with pre('validate', ...) middleware from mongoose)
+  idapi.validator('User', Joi => ({
+    email: Joi.string()
         .email({ tlds: { allow: false } })
         .required(),
-    firstname: (Joi) => Joi.string().max(30).min(1).required(),
-    lastname: (Joi) => Joi.string().max(30).min(1).required(),
-    role: (Joi) => Joi.string().valid('admin', 'user').required(),
-  })
+    firstname: Joi.string().max(30).min(1).required(),
+    lastname: Joi.string().max(30).min(1).required(),
+    role: Joi.string().valid('admin', 'user').required(),
+  }))
 
   // create our mongoose model (important: don't do it before the validator)
   idapi.model('User')
 
-  // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
-  idapi.routes('User', {
-    $create: {
+  // generating our routes with pre-built methods: $post, $getMany, $get, $put, $delete + custom routes
+  idapi.routes('User', [
+    {
+      route: '$post',
       access: 'public', // refering to our authorizations.public function
     },
-    $getMany: {
-      access: 'public',
+    {
+      route: '$getMany',
+      access: async ctx => true, // can also be a function
       queryMiddleware: (query) => {
         query.select('-password')
       },
     },
-    $get: {
+    {
+      route: '$get',
       access: 'admin',
     },
-    $update: {
+    {
+      route: '$put',
       access: 'admin',
       before: (ctx) => (ctx.req.body.password = undefined), // before and after middlewares are available for every routes
     },
-    $delete: {
+    {
+      route: '$delete',
       access: 'admin',
     },
-    '/user/current': {
+    {
+      route: '/user/current',
       method: 'get',
       access: 'private',
       resolver: async ({ Model }) => {
@@ -113,15 +114,17 @@ const server = async () => {
         return user // the returning value is sent in json with status code 200
       },
     },
-    '/user/token': {
-      method: 'get',
+    {
+      route: '/user/token',
+      method:'get',
       access: 'public',
       resolver: async ({ data }) => {
         const token = await generateToken(data)
         return token
       },
     },
-    '/user/password': {
+    {
+      route: '/user/password',
       method: 'put',
       access: 'private',
       resolver: async (ctx) => {
@@ -132,7 +135,7 @@ const server = async () => {
         }
       },
     },
-  })
+  ])
 }
 
 server()

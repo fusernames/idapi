@@ -7,7 +7,7 @@ module.exports = ({ _sort, _page, _limit, _full, ...rest }) => {
     limit = 199
   }
   let result = {
-    sort: [['createdAt', -1]],
+    sort: undefined,
     where: {},
     limit,
     page,
@@ -17,6 +17,7 @@ module.exports = ({ _sort, _page, _limit, _full, ...rest }) => {
   if (_sort) {
     let [field, value] = _sort.split(':')
     if (value === '-1' || value === '1') result.sort = [[field, value]]
+    else result.sort = [[field, '-1']]
   }
   for (let [key, value] of Object.entries(rest)) {
     if (key.includes(':')) {

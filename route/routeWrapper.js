@@ -10,9 +10,10 @@ const routeWrapper = (
     async () => {
       // access
       // console.log(`[idapi] access ${access}, authorizations: ${authorizations[access]}`)
-      if (access && authorizations[access]) {
-        const accessGranted = await authorizations[access]({ access, req })
-        if (!accessGranted) throw { status: 403, code: 'Unauthorized' }
+      if (access) {
+        const accessFn = authorizations[access] || access
+        const accessGranted = await accessFn({ access, req })
+        if (!accessGranted) throw { status: 403, code: 'Non autorisé' }
       }
       // model
       const Model = idapi[modelName]

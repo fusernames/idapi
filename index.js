@@ -1,8 +1,9 @@
 const connectMongoose = require('./mongoose/connectMongoose')
 const connectExpress = require('./express/connectExpress')
-const generateRoutes = require('./utils/generateRoutes')
-const Validator = require('./utils/Validator')
-const queryParser = require('./utils/queryParser')
+const generateRoutes = require('./route/generateRoutes')
+const queryParser = require('./route/queryParser')
+const Validator = require('./validator/Validator')
+const sendError = require('./utils/sendError')
 
 class Idapi {
   // constructor() {
@@ -20,6 +21,7 @@ class Idapi {
     this.uri = uri
     this.mongoose = await connectMongoose(uri)
     this.app = connectExpress(port)
+    this.sendError = sendError
     console.log('[idapi] idapi app is connected !')
   }
 
