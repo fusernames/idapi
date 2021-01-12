@@ -6,6 +6,6 @@ module.exports = async (req, res, fn, options) => {
   } catch (e) {
     console.error(e)
     if (e.status) res.status(e.status).json(e)
-    else res.status(400).json('Unhandled Error')
+    else res.status(500).json('Unhandled Error')
   }
 }

@@ -1,7 +1,16 @@
 const respond = require('./respond')
 
+interface Context {
+  Model: any,
+  req: Request,
+  res: Response,
+  result?
+}
+
 const routeWrapper = (
-  { req, res, before, after, access, modelName, disableRespond, authorizations, idapi },
+  { before, after, access, disableRespond, authorizations, Model },
+  req,
+  res,
   resolver
 ) => {
   respond(
@@ -16,7 +25,6 @@ const routeWrapper = (
         if (!accessGranted) throw { status: 403, code: 'Non autorisé' }
       }
       // model
-      const Model = idapi[modelName]
       // before
       if (before) await before({ Model, req, res })
       // resolver

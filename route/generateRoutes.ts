@@ -1,6 +1,4 @@
-import { object } from "joi"
 import { Request, Response } from 'express';
-
 const routeWrapper = require('./routeWrapper')
 const queryParser = require('./queryParser')
 const pluralize = require('pluralize')
@@ -12,18 +10,19 @@ interface ICtx {
   res: Response,
 }
 
-interface RouterContext {
+interface RouteCtx {
   lowercaseName?: string | null;
   authorizations: Authorizations
-  route: IRoute
-  modelName?: string
+  route: Route
+  modelName: string
+  Model: any
 }
 
 interface Authorizations {
   [index: string]: Promise<boolean>
 }
 
-interface IRoute {
+interface Route {
   path: string;
   method: string;
   access: string | Promise<boolean>;
@@ -34,54 +33,54 @@ interface IRoute {
 }
 
 
-module.exports = (modelName: string, routes: IRoute[], authorizations: Authorizations) => {
-  const router = require('express').Router()
+module.exports = (modelName: string, routes: Route[], authorizations: Authorizations) => {
   for (let route of routes) {
     const lowercaseName = modelName ? modelName.charAt(0).toLowerCase() + modelName.slice(1) : undefined
-    const ctxRouter: RouterContext = {
+    const Model = idapi[modelName]
+    const routeCtx: RouteCtx = {
       lowercaseName,
       authorizations,
       modelName,
+      Model: Model || {},
       route
     }
     if (generatorFunctions[route.path]) {
       console.log(`[idapi]: generated ${route.path} for ${modelName}`)
-      generatorFunctions[route.path](ctxRouter, router)
+      generatorFunctions[route.path](routeCtx)
     } else {
-      generatorFunctions.$custom(ctxRouter, router)
+      generatorFunctions.$custom(routeCtx)
     }
   }
-  return router
 }
 
 const generatorFunctions = {
-  $custom: (ctxRouter: RouterContext, router) => {
-    if (ctxRouter.route.method) {
-      router[ctxRouter.route.method](ctxRouter.route.path, async (req: Request, res: Response) => {
-        routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-          const result = await ctxRouter.route.resolver({ Model, req, res })
+  $custom: (routeCtx: RouteCtx) => {
+    if (routeCtx.route.method) {
+      idapi.app[routeCtx.route.method](routeCtx.route.path, async (req: Request, res: Response) => {
+        routeWrapper(routeCtx, req, res, async () => {
+          const result = await routeCtx.route.resolver({ Model: routeCtx.Model, req, res })
           return result
         })
       })
     }
   },
-  $post: (ctxRouter: RouterContext, router) => {
-    router.post(`/${ctxRouter.lowercaseName}`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-        const result = await Model.create(req.body)
+  $post: (routeCtx: RouteCtx) => {
+    idapi.app.post(`/${routeCtx.lowercaseName}`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
+        const result = await routeCtx.Model.create(req.body)
         return result
       })
     })
   },
-  $getMany: (ctxRouter: RouterContext, router) => {
-    router.get(`/${pluralize(ctxRouter.lowercaseName)}`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
+  $getMany: (routeCtx: RouteCtx) => {
+    idapi.app.get(`/${pluralize(routeCtx.lowercaseName)}`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
         const { where, sort, limit, skip, page, full } = queryParser(req.query)
-        let mainQuery = Model.find(where).skip(skip).limit(limit).sort(sort)
-        if (ctxRouter.route.queryMiddleware) {
-          await ctxRouter.route.queryMiddleware(mainQuery)
+        let mainQuery = routeCtx.Model.find(where).skip(skip).limit(limit).sort(sort)
+        if (routeCtx.route.queryMiddleware) {
+          await routeCtx.route.queryMiddleware(mainQuery)
         }
-        const [results, count] = await Promise.all([mainQuery.exec(), Model.countDocuments(where)])
+        const [results, count] = await Promise.all([mainQuery.exec(), routeCtx.Model.countDocuments(where)])
         return {
           results,
           count,
@@ -92,13 +91,13 @@ const generatorFunctions = {
       })
     })
   },
-  $get: (ctxRouter: RouterContext, router) => {
-    router.get(`/${ctxRouter.lowercaseName}`, (req: Request, res: Response) => {
+  $get: (routeCtx: RouteCtx) => {
+    idapi.app.get(`/${routeCtx.lowercaseName}`, (req: Request, res: Response) => {
       const { where } = queryParser(req.query)
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-        let mainQuery = Model.findOne(where)
-        if (ctxRouter.route.queryMiddleware) {
-          await ctxRouter.route.queryMiddleware(mainQuery)
+      routeWrapper(routeCtx, req, res, async () => {
+        let mainQuery = routeCtx.Model.findOne(where)
+        if (routeCtx.route.queryMiddleware) {
+          await routeCtx.route.queryMiddleware(mainQuery)
         }
         const result = await mainQuery.exec()
         if (!result) throw { status: 404, code: `La ressource n'existe pas` }
@@ -106,20 +105,20 @@ const generatorFunctions = {
       })
     })
   },
-  $delete: (ctxRouter: RouterContext, router) => {
-    router.delete(`/${ctxRouter.lowercaseName}`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-        const result = await Model.findOne({ _id: req.body._id })
+  $delete: (routeCtx: RouteCtx) => {
+    idapi.app.delete(`/${routeCtx.lowercaseName}`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
+        const result = await routeCtx.Model.findOne({ _id: req.body._id })
         if (!result) throw { status: 404, code: `La ressource n'existe pas` }
         await result.remove()
         return result
       })
     })
   },
-  $put: (ctxRouter: RouterContext, router) => {
-    router.put(`/${ctxRouter.lowercaseName}`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-        const result = await Model.findOne({ _id: req.body._id })
+  $put: (routeCtx: RouteCtx) => {
+    idapi.app.put(`/${routeCtx.lowercaseName}`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
+        const result = await routeCtx.Model.findOne({ _id: req.body._id })
         if (!result) throw { status: 404, code: `La ressource n'existe pas` }
         result._old = result.toObject()
         for (let [key, value] of Object.entries(req.body)) {
@@ -130,19 +129,19 @@ const generatorFunctions = {
       })
     })
   },
-  $validate: (ctxRouter: RouterContext, router) => {
-    router.post(`/${ctxRouter.lowercaseName}/validate`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model, req }) => {
-        const errors = idapi.validators[ctxRouter.modelName].validateForm(req.body)
+  $validate: (routeCtx: RouteCtx) => {
+    idapi.app.post(`/${routeCtx.lowercaseName}/validate`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
+        const errors = idapi.validators[routeCtx.modelName].validateForm(req.body)
         if (errors) return errors
         else return {}
       })
     })
   },
-  $mine: (ctxRouter, router) => {
-    router.get(`/${ctxRouter.lowercaseName}/mine`, (req: Request, res: Response) => {
-      routeWrapper({ ...ctxRouter, req, res }, async ({ Model }) => {
-        const result = await Model.findOne({ user: req.myId })
+  $mine: (routeCtx: RouteCtx) => {
+    idapi.app.get(`/${routeCtx.lowercaseName}/mine`, (req: Request, res: Response) => {
+      routeWrapper(routeCtx, req, res, async () => {
+        const result = await routeCtx.Model.findOne({ user: req.myId })
         // if (!result) throw { status: 404, code: `Aucune ressource trouvée` }
         return result
       })
