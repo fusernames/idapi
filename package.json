@@ -8,6 +8,8 @@
     "test": "test"
   },
   "dependencies": {
+    "@types/joi": "^14.3.4",
+    "@types/mongoose": "^5.10.3",
     "body-parser": "^1.19.0",
     "chalk": "^3.0.0",
     "cookie-parser": "^1.4.5",
@@ -18,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongoose": "^5.11.0",
+    "mongoose-query-parser": "^1.1.9",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
