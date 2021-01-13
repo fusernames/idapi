@@ -15,6 +15,7 @@ const server = async () => {
 }
 ```
 
+In this example we will take a look of all features by building an user-authentication system quickly
 - [Middlewares](#middlewares)
 - [Create a model & a validator](#create-a-model--a-validator)
 - [Routes authorization system](#routes-authorization-system)
@@ -22,7 +23,7 @@ const server = async () => {
 
 
 ## Middlewares
-You can add middlewares with the express app. For exemple we will add a custom middleware to parse the user token
+You can add middlewares with the express app. For example we will add a custom middleware to parse the user token
 ```js
   const jwt = require('jsonwebtoken')
 
@@ -69,7 +70,7 @@ Adding a model "User" with mongoose, check mongoose schema for the second argume
     role: Joi.string().valid('admin', 'user').default('user').required(),
   })
 ```
-**IMPORTANT** validate our mongoose model (don't do it before the validator)
+**IMPORTANT** initialize our mongoose model (don't do it before the validator)
 ```js
   idapi.model('User')
  ```
@@ -99,6 +100,9 @@ Exemple: our "User" $get path gonna be "/users/:_id"
 ```js
   idapi.routes('User', { 
     $post: {
+      before: async ({ req }) => {
+        delete req.body.role // don't mess with security
+      },
       access: 'public', // refering to our authorizations.public function
     },
     $getMany: { // works with https://www.npmjs.com/package/mongoose-query-parser
@@ -151,7 +155,7 @@ Exemple: our "User" $get path gonna be "/users/:_id"
 }
 ```
 
-Simple exemple
+Simple example
 ```js
   // fast route
   idapi.routes(null, {
