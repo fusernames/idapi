@@ -97,7 +97,7 @@ Simple exemple
       resolver: async (ctx) => 'Hello World' // ctx object contains { req, res, Model (if provided in 1st arg) }
     },
     'GET /widthDisabledRespond': {
-      disableRespond: true, // disableRespond allow you to user ctx.res to respond
+      disableRespond: true, // disableRespond allows you to user ctx.res to respond
       resolver: async (ctx) => ctx.res.json('Hello World') // ctx object contains { req, res, Model (if provided in 1st arg) }
     }
   })
