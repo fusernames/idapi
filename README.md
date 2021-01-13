@@ -61,20 +61,10 @@ const server = async () => {
     email: {
       type: String,
       unique: true,
-      required: true,
     },
-    firstname: {
-      type: String,
-      required: true,
-    },
-    lastname: {
-      type: String,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
+    firstname: String,
+    lastname: String,
+    password: String,
     role: {
       type: String,
       enum: ['user', 'admin'],
@@ -90,14 +80,11 @@ const server = async () => {
   })
 
   // 6. add a validator (optional) for our model (validation is used with pre('save', ...) middleware from mongoose)
-  idapi.validator('User', {
-    email: (Joi) =>
-      Joi.string()
-        .email({ tlds: { allow: false } })
-        .required(),
-    firstname: (Joi) => Joi.string().max(30).min(1).required(),
-    lastname: (Joi) => Joi.string().max(30).min(1).required(),
-    role: (Joi) => Joi.string().valid('admin', 'user').required(),
+  idapi.validator('User', Joi => ({
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
+    firstname: Joi.string().max(30).min(1).required(),
+    lastname: Joi.string().max(30).min(1).required(),
+    role: Joi.string().valid('admin', 'user').required(),
   })
 
   // 7. validate our mongoose model (important: don't do it before the validator)
