@@ -104,12 +104,23 @@ const server = async () => {
 ## Generate routes
 ```js
 
-  // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
-  idapi.routes('User', {
-    $create: {
+  // fast route
+  idapi.routes(null, {
+    'GET /': {
+      resolver: async (ctx) => 'Hello World' // ctx object contains { req, res, Model (if provided in 1st arg) }
+    },
+    'GET /widthDisabledRespond': {
+      disableRespond: true,
+      resolver: async (ctx) => ctx.res.json('Hello World') // ctx object contains { req, res, Model (if provided in 1st arg) }
+    }
+  })
+
+  // lets create routes our users with some pre-built functions: $post, $getMany, $get, $update, $delete + custom routes
+  idapi.routes('User', { 
+    $post: {
       access: 'public', // refering to our authorizations.public function
     },
-    $getMany: {
+    $getMany: { // works with https://www.npmjs.com/package/mongoose-query-parser
       access: 'public',
       queryMiddleware: async (query) => {
         query.select('-password')
@@ -128,8 +139,8 @@ const server = async () => {
     'GET /user/current': {
       access: 'private',
       resolver: async (ctx) => {
-        const user = await Model.findOne({ _id: ctx.req.myId })
-        if (!user) idapi.error(404, { message: 'Utilisateur introuvable' }) // cancel current execution and send response 1st param : code, 2nd param: content you want to send
+        const user = await idapi.User.findOne({ _id: ctx.req.myId })
+        if (!user) idapi.error(404, { message: `Couldn't find this user` }) // cancel current execution and send response 1st param : code, 2nd param: content you want to send
         return user // the returning value is sent in json with status code 200
       },
     },
@@ -140,14 +151,16 @@ const server = async () => {
         return token
       },
     },
-    'PUT /user/password': {
+    'PUT /user/:_id/password': {
       access: 'private',
-      resolver: async (ctx) => {
-        const user = await ctx.Model.findOne({ _id })
-        const match = await bcrypt.compare(password, user.password)
-        if (match === false) {
-          throw { status: 403, code: 'Mauvais mot de passe' }
-        }
+      resolver: async ({ req }) => {
+        const user = await idapi.User.findOne({ _id: req.params._id })
+        const match = await bcrypt.compare(req.body.password, user.password)
+        if (match === false)
+          idapi.error(403, { message: 'Bad password' })
+        user.password = req.body.newPassword
+        await user.save()
+        return user
       },
     },
   })
