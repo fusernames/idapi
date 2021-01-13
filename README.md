@@ -79,7 +79,7 @@ const server = async () => {
     next()
   })
 
-  // 6. add a validator (optional) for our model (validation is used with pre('save', ...) middleware from mongoose)
+  // 6. add a validator (optional) for our model (validation is used with pre('validate', ...) middleware from mongoose)
   idapi.validator('User', Joi => ({ // see https://joi.dev/api/?v=17.3.0
     email: Joi.string().email({ tlds: { allow: false } }).required(),
     firstname: Joi.string().max(30).min(1).required(),
