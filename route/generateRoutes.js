@@ -6,7 +6,6 @@ const { MongooseQueryParser } = require('mongoose-query-parser')
 // import { IRoute, ICtx, IRouteCtx, IAuthorizations } from '../types/route'
 const parser = new MongooseQueryParser()
 const url = require('url')
-const { query } = require('express')
 
 module.exports = (modelName, routes, idapi) => {
   const router = require('express').Router()
@@ -20,7 +19,7 @@ module.exports = (modelName, routes, idapi) => {
       modelName,
       Model: Model || {},
       route,
-      idapi
+      idapi,
     }
     if (generatorFunctions[path] && modelName) {
       console.log(`[idapi]: generated ${path} for ${modelName}`)
@@ -28,8 +27,8 @@ module.exports = (modelName, routes, idapi) => {
     } else {
       generatorFunctions.$custom(routeCtx, router, path)
     }
-    return router
   }
+  return router
 }
 
 const generatorFunctions = {
