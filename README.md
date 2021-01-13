@@ -11,6 +11,7 @@ const server = async () => {
     uri: process.env.URI,
     port: process.env.PORT,
   })
+  // now your server is listening on port and idapi.mongoose is connected
 }
 ```
 
