@@ -20,7 +20,7 @@ const server = async () => {
 }
 ```
 
-### Middlewares
+## Middlewares
 ```js
   // 2. adding a custom middleware to parse the user token
   const jwt = require('jsonwebtoken')
@@ -36,7 +36,7 @@ const server = async () => {
   })
 ```
 
-### Routes authorization system
+## Routes authorization system
 ```js
   //3. creating our authorizations functions (for routes)
   idapi.authorizations = {
@@ -51,7 +51,7 @@ const server = async () => {
   }
 ```
 
-### Create a model & validator
+## Create a model & validator
 ```js
   // 4. adding a model "User" with mongoose, check mongoose schema for the second argument
   const userSchema = idapi.schema('User', {
@@ -101,7 +101,7 @@ const server = async () => {
   idapi.model('User')
   ```
 
-### Generate routes
+## Generate routes
 ```js
 
   // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
