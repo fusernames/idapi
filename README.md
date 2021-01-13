@@ -103,7 +103,7 @@ Simple exemple
   })
 ```
 
-Lets create routes our users with some pre-built functions:
+Lets create our users routes with some pre-built functions:
 >$post, $getMany, $get, $put, $delete + custom routes
 ```js
   idapi.routes('User', { 
