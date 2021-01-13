@@ -65,11 +65,7 @@ const server = async () => {
     firstname: String,
     lastname: String,
     password: String,
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
-    },
+    role: String
   })
 
   // 5. the userSchema is a mongoose schema instance, so you can work with it and add hooks
@@ -84,7 +80,7 @@ const server = async () => {
     email: Joi.string().email({ tlds: { allow: false } }).required(),
     firstname: Joi.string().max(30).min(1).required(),
     lastname: Joi.string().max(30).min(1).required(),
-    role: Joi.string().valid('admin', 'user').required(),
+    role: Joi.string().valid('admin', 'user').default('user').required(),
   })
 
   // 7. validate our mongoose model (important: don't do it before the validator)
