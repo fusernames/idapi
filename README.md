@@ -20,6 +20,7 @@ const server = async () => {
 - [Create a model & a validator](#create-a-model--a-validator)
 - [Generate routes](#generate-routes)
 
+
 ## Middlewares
 ```js
   // 2. adding a custom middleware to parse the user token
@@ -36,6 +37,7 @@ const server = async () => {
   })
 ```
 
+
 ## Routes authorization system
 ```js
   //3. creating our authorizations functions (for routes)
@@ -50,6 +52,7 @@ const server = async () => {
     },
   }
 ```
+
 
 ## Create a model & a validator
 ```js
@@ -99,7 +102,8 @@ const server = async () => {
 
   // 7. validate our mongoose model (important: don't do it before the validator)
   idapi.model('User')
-  ```
+```
+
 
 ## Generate routes
 Simple exemple
