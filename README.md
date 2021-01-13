@@ -2,11 +2,11 @@
 Create an (express + mongoose) complete api in seconds. Created by [id](https://industrie-digitale.fr)
 
 ## Get started
+Connect express app and mongo database
 ```js
 const idapi = require('idapi')
 
 const server = async () => {
-  // 1. connect express app and mongo database
   await idapi.init({
     uri: process.env.URI,
     port: process.env.PORT,
@@ -22,8 +22,8 @@ const server = async () => {
 
 
 ## Middlewares
+You can add custom middlewares, with the express app for exemple we will add a custom middleware to parse the user token
 ```js
-  // 2. adding a custom middleware to parse the user token
   const jwt = require('jsonwebtoken')
 
   idapi.app.use((req, res, next) => {
@@ -39,8 +39,8 @@ const server = async () => {
 
 
 ## Routes authorization system
+Creating our authorizations functions (for routes, see below)
 ```js
-  //3. creating our authorizations functions (for routes)
   idapi.authorizations = {
     public: async () => true, // returning true if access is granted and false if not
     private: async (ctx) => Boolean(ctx.req.myId),
@@ -55,8 +55,8 @@ const server = async () => {
 
 
 ## Create a model & a validator
+Adding a model "User" with mongoose, check mongoose schema for the second argument
 ```js
-  // 4. adding a model "User" with mongoose, check mongoose schema for the second argument
   const userSchema = idapi.schema('User', {
     email: {
       type: String,
@@ -67,15 +67,18 @@ const server = async () => {
     password: String,
     role: String
   })
-
-  // 5. the userSchema is a mongoose schema instance, so you can work with it and add hooks
+```
+"userSchema" is a mongoose schema instance, so you can work with it and add hooks
+```js
   userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()
     this.password = await bcrypt.hash(this.password, 8)
     next()
   })
 
-  // 6. add a validator (optional) for our model (validation is used with pre('validate', ...) middleware from mongoose)
+```
+  Adding a validator (optional) for our model (validation is used with pre('validate'... hook from mongoose)
+```js
   idapi.validator('User', Joi => ({ // see https://joi.dev/api/?v=17.3.0
     email: Joi.string().email({ tlds: { allow: false } }).required(),
     firstname: Joi.string().max(30).min(1).required(),
@@ -89,6 +92,7 @@ const server = async () => {
 
 
 ## Generate routes
+
 Simple exemple
 ```js
   // fast route
