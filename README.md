@@ -14,7 +14,6 @@ const server = async () => {
 }
 ```
 
-- [Get started](#get-started)
 - [Middlewares](#middlewares)
 - [Routes authorization system](#routes-authorization-system)
 - [Create a model & a validator](#create-a-model--a-validator)
