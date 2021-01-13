@@ -1,21 +1,24 @@
 # idapi
 
-Node.js mongoose &amp; express framework to build fast api models and routes created by [https://industrie-digitale.fr](https://industrie-digitale.fr)
+Node.js mongoose &amp; express framework to build fast api models and routes created by [id](https://industrie-digitale.fr)
 
 ## Get started
-
 ```js
 const idapi = require('idapi')
 const jwt = require('jsonwebtoken')
 
 const server = async () => {
-  // connect express app and mongo database
+  // 1. connect express app and mongo database
   await idapi.init({
-    uri: `your uri`,
-    port: 5000,
+    uri: process.env.URI,
+    port: process.env.port,
   })
+}
+```
 
-  // adding a custom middleware to parse the user token
+## Middlewares
+```js
+  // 2. adding a custom middleware to parse the user token
   idapi.app.use((req, res, next) => {
     let token = req.cookies.Authorization || req.headers.authorization
     if (token) {
@@ -25,8 +28,11 @@ const server = async () => {
     }
     next()
   })
+```
 
-  // creating our authorizations functions (for routes)
+## Routes authorization system
+```js
+  //3. creating our authorizations functions (for routes)
   idapi.authorizations = {
     public: async () => true, // returning true if access is granted and false if not
     private: async (ctx) => Boolean(ctx.req.myId),
@@ -37,8 +43,11 @@ const server = async () => {
       return true
     },
   }
+```
 
-  // adding a model "User" with mongoose, check mongoose schema for the second argument
+## Create a model & validator
+```js
+  // 4. adding a model "User" with mongoose, check mongoose schema for the second argument
   const userSchema = idapi.schema('User', {
     email: {
       type: String,
@@ -64,14 +73,14 @@ const server = async () => {
     },
   })
 
-  // the userSchema is a mongoose schema instance
+  // 5. the userSchema is a mongoose schema instance, so you can work with it and add hooks
   userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()
     this.password = await bcrypt.hash(this.password, 8)
     next()
   })
 
-  // adding a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
+  // 6. add a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
   idapi.validator('User', {
     email: (Joi) =>
       Joi.string()
@@ -82,8 +91,12 @@ const server = async () => {
     role: (Joi) => Joi.string().valid('admin', 'user').required(),
   })
 
-  // create our mongoose model (important: don't do it before the validator)
+  // 7. validate our mongoose model (important: don't do it before the validator)
   idapi.model('User')
+  ```
+
+## Generate routes
+```js
 
   // generating our routes with pre-built methods: $create, $getMany, $get, $update, $delete + custom routes
   idapi.routes('User', {
@@ -92,7 +105,7 @@ const server = async () => {
     },
     $getMany: {
       access: 'public',
-      queryMiddleware: (query) => {
+      queryMiddleware: async (query) => {
         query.select('-password')
       },
     },
@@ -106,25 +119,22 @@ const server = async () => {
     $delete: {
       access: 'admin',
     },
-    '/user/current': {
-      method: 'get',
+    'GET /user/current': {
       access: 'private',
       resolver: async (ctx) => {
         const user = await Model.findOne({ _id: ctx.req.myId })
-        if (!user) throw { status: 404, code: 'Utilisateur introuvable' } // send the response with status as status and code as content
+        if (!user) idapi.error(404, { message: 'Utilisateur introuvable' }) // cancel current execution and send response 1st param : code, 2nd param: content you want to send
         return user // the returning value is sent in json with status code 200
       },
     },
-    '/user/token': {
-      method: 'get',
+    'GET /user/token': {
       access: 'public',
       resolver: async (ctx) => {
         const token = await generateToken(ctx.req.query)
         return token
       },
     },
-    '/user/password': {
-      method: 'put',
+    'PUT /user/password': {
       access: 'private',
       resolver: async (ctx) => {
         const user = await ctx.Model.findOne({ _id })
@@ -136,6 +146,4 @@ const server = async () => {
     },
   })
 }
-
-server()
 ```
