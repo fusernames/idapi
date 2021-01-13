@@ -105,7 +105,8 @@ Simple exemple
 ```
 
 Lets create our users routes with some pre-built functions:
->$post, $getMany, $get, $put, $delete + custom routes
+> **_NOTE:_**  $getMany, $get, $post, $put, $delete generates your routes faster !
+> **_NOTE:_**  generated routes requires a modelName as 1st parameter, and will use plural path for exemple for our User $get we gonna get "/users/:_id"
 ```js
   idapi.routes('User', { 
     $post: {

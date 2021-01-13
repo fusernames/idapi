@@ -87,9 +87,9 @@ const generatorFunctions = {
     })
   },
   $delete: (routeCtx, router) => {
-    router.delete(`/${routeCtx.pluralName}`, (req, res) => {
+    router.delete(`/${routeCtx.pluralName}/:_id`, (req, res) => {
       routeWrapper(routeCtx, req, res, async () => {
-        const result = await routeCtx.Model.findOne({ _id: req.body._id })
+        const result = await routeCtx.Model.findOne({ _id: req.params._id })
         if (!result) throw { status: 404, code: `La ressource n'existe pas` }
         await result.remove()
         return result
@@ -97,9 +97,9 @@ const generatorFunctions = {
     })
   },
   $put: (routeCtx, router) => {
-    router.put(`/${routeCtx.pluralName}`, (req, res) => {
+    router.put(`/${routeCtx.pluralName}/:_id`, (req, res) => {
       routeWrapper(routeCtx, req, res, async () => {
-        const result = await routeCtx.Model.findOne({ _id: req.body._id })
+        const result = await routeCtx.Model.findOne({ _id: req.params._id })
         if (!result) throw { status: 404, code: `La ressource n'existe pas` }
         result._old = result.toObject()
         for (let [key, value] of Object.entries(req.body)) {
