@@ -1,11 +1,11 @@
 # idapi
 Generate an (express + mongoose) complete api in seconds. Created by [id](https://industrie-digitale.fr)
 
-- [get started](#get-started)
-- [middlewares](#middlewares)
-- [authorizations](#routes-authorization-system)
-- [model & validator](#create-a-model--a-validator)
-- [routes](#generate-routes)
+- [Get started](#get-started)
+- [Middlewares](#middlewares)
+- [Routes authorization system](#routes-authorization-system)
+- [Create a model & a validator](#create-a-model--a-validator)
+- [Generate routes](#generate-routes)
 
 ## Get started
 ```js
