@@ -68,10 +68,11 @@ Adding a model "User" with mongoose, check mongoose schema for the second argume
     lastname: Joi.string().max(30).min(1).required(),
     role: Joi.string().valid('admin', 'user').default('user').required(),
   })
-
-  // 7. validate our mongoose model (important: don't do it before the validator)
-  idapi.model('User')
 ```
+**IMPORTANT** validate our mongoose model (don't do it before the validator)
+```js
+  idapi.model('User')
+ ```
 
 ## Routes authorization system
 Creating our authorizations functions (for routes, see below)
@@ -90,23 +91,11 @@ Creating our authorizations functions (for routes, see below)
 ```
 
 ## Generate routes
-Simple exemple
-```js
-  // fast route
-  idapi.routes(null, {
-    'GET /': {
-      resolver: async (ctx) => 'Hello World' // ctx object contains { req, res, Model (if provided in 1st arg) }
-    },
-    'GET /widthDisabledRespond': {
-      disableRespond: true, // disableRespond allows you to user ctx.res to respond
-      resolver: async (ctx) => ctx.res.json('Hello World') // ctx object contains { req, res, Model (if provided in 1st arg) }
-    }
-  })
-```
-
 Lets create our users routes with some pre-built functions:
 > **_NOTE:_**  $getMany, $get, $post, $put, $delete generates your routes faster !
-> **_NOTE:_**  generated routes requires a modelName as 1st parameter, and will use plural path for exemple for our User $get we gonna get "/users/:_id"
+
+Generated routes requires a modelName in 1st parameter, and will use plural path. 
+Exemple: our "User" $get path gonna be "/users/:_id"
 ```js
   idapi.routes('User', { 
     $post: {
@@ -160,4 +149,18 @@ Lets create our users routes with some pre-built functions:
     },
   })
 }
+```
+
+Simple exemple
+```js
+  // fast route
+  idapi.routes(null, {
+    'GET /': {
+      resolver: async (ctx) => 'Hello World' // ctx object contains { req, res, Model (if provided in 1st arg) }
+    },
+    'GET /widthDisabledRespond': {
+      disableRespond: true, // disableRespond allows you to user ctx.res to respond
+      resolver: async (ctx) => ctx.res.json('Hello World') // ctx object contains { req, res, Model (if provided in 1st arg) }
+    }
+  })
 ```
