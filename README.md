@@ -51,7 +51,7 @@ const server = async () => {
   }
 ```
 
-## Create a model & validator
+## Create a model & a validator
 ```js
   // 4. adding a model "User" with mongoose, check mongoose schema for the second argument
   const userSchema = idapi.schema('User', {
@@ -86,7 +86,7 @@ const server = async () => {
     next()
   })
 
-  // 6. add a validator for our model (validation is used with pre('save', ...) middleware from mongoose)
+  // 6. add a validator (optional) for our model (validation is used with pre('save', ...) middleware from mongoose)
   idapi.validator('User', {
     email: (Joi) =>
       Joi.string()
