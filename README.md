@@ -16,13 +16,13 @@ const server = async () => {
 ```
 
 - [Middlewares](#middlewares)
-- [Routes authorization system](#routes-authorization-system)
 - [Create a model & a validator](#create-a-model--a-validator)
+- [Routes authorization system](#routes-authorization-system)
 - [Generate routes](#generate-routes)
 
 
 ## Middlewares
-You can add custom middlewares, with the express app for exemple we will add a custom middleware to parse the user token
+You can add middlewares with the express app. For exemple we will add a custom middleware to parse the user token
 ```js
   const jwt = require('jsonwebtoken')
 
@@ -36,23 +36,6 @@ You can add custom middlewares, with the express app for exemple we will add a c
     next()
   })
 ```
-
-
-## Routes authorization system
-Creating our authorizations functions (for routes, see below)
-```js
-  idapi.authorizations = {
-    public: async () => true, // returning true if access is granted and false if not
-    private: async (ctx) => Boolean(ctx.req.myId),
-    admin: async (ctx) => {
-      if (!ctx.req.myId) return false
-      const user = await idapi.User.model.findOne({ _id: ctx.req.id, role: 'admin' })
-      if (!user) return false
-      return true
-    },
-  }
-```
-
 
 ## Create a model & a validator
 Adding a model "User" with mongoose, check mongoose schema for the second argument
@@ -90,9 +73,23 @@ Adding a model "User" with mongoose, check mongoose schema for the second argume
   idapi.model('User')
 ```
 
+## Routes authorization system
+Creating our authorizations functions (for routes, see below)
+> **_NOTE:_**  You can add as many functions you want
+```js
+  idapi.authorizations = {
+    public: async () => true,
+    private: async (ctx) => Boolean(ctx.req.myId),
+    admin: async (ctx) => {
+      if (!ctx.req.myId) return false
+      const user = await idapi.User.model.findOne({ _id: ctx.req.id, role: 'admin' })
+      if (!user) return false
+      return true
+    },
+  }
+```
 
 ## Generate routes
-
 Simple exemple
 ```js
   // fast route
