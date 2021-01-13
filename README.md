@@ -1,5 +1,5 @@
 # idapi
-Generate an (express + mongoose) complete api in seconds. Created by [id](https://industrie-digitale.fr)
+Create an (express + mongoose) complete api in seconds. Created by [id](https://industrie-digitale.fr)
 
 ## Get started
 ```js
