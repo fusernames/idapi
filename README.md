@@ -15,7 +15,7 @@ const server = async () => {
   // 1. connect express app and mongo database
   await idapi.init({
     uri: process.env.URI,
-    port: process.env.port,
+    port: process.env.PORT,
   })
 }
 ```
