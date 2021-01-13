@@ -102,19 +102,22 @@ const server = async () => {
   ```
 
 ## Generate routes
+Simple exemple
 ```js
-
   // fast route
   idapi.routes(null, {
     'GET /': {
       resolver: async (ctx) => 'Hello World' // ctx object contains { req, res, Model (if provided in 1st arg) }
     },
     'GET /widthDisabledRespond': {
-      disableRespond: true,
+      disableRespond: true, // disableRespond allow you to user ctx.res to respond
       resolver: async (ctx) => ctx.res.json('Hello World') // ctx object contains { req, res, Model (if provided in 1st arg) }
     }
   })
+```
 
+Lets create routes our users with some pre-built functions: $post, $getMany, $get, $update, $delete + custom routes
+```js
   // lets create routes our users with some pre-built functions: $post, $getMany, $get, $update, $delete + custom routes
   idapi.routes('User', { 
     $post: {
@@ -128,6 +131,9 @@ const server = async () => {
     },
     $get: {
       access: 'admin',
+      after: async (ctx, result) => {
+        delete result.password
+      }
     },
     $update: {
       access: 'admin',
