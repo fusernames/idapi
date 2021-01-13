@@ -103,9 +103,9 @@ Simple exemple
   })
 ```
 
-Lets create routes our users with some pre-built functions: $post, $getMany, $get, $update, $delete + custom routes
+Lets create routes our users with some pre-built functions:
+>$post, $getMany, $get, $put, $delete + custom routes
 ```js
-  // lets create routes our users with some pre-built functions: $post, $getMany, $get, $update, $delete + custom routes
   idapi.routes('User', { 
     $post: {
       access: 'public', // refering to our authorizations.public function
@@ -122,7 +122,7 @@ Lets create routes our users with some pre-built functions: $post, $getMany, $ge
         delete result.password
       }
     },
-    $update: {
+    $put: {
       access: 'admin',
       before: (ctx) => (ctx.req.body.password = undefined), // before and after middlewares are available for every routes
     },
