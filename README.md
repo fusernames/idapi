@@ -4,7 +4,6 @@ Generate an (express, mongoose) in seconds. Created by [id](https://industrie-di
 ## Get started
 ```js
 const idapi = require('idapi')
-const jwt = require('jsonwebtoken')
 
 const server = async () => {
   // 1. connect express app and mongo database
@@ -18,6 +17,8 @@ const server = async () => {
 ## Middlewares
 ```js
   // 2. adding a custom middleware to parse the user token
+  const jwt = require('jsonwebtoken')
+
   idapi.app.use((req, res, next) => {
     let token = req.cookies.Authorization || req.headers.authorization
     if (token) {
