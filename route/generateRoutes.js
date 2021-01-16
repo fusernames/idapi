@@ -60,7 +60,7 @@ const preBuiltRoutes = {
         await route.queryMiddleware(mainQuery)
       }
       const result = await mainQuery.exec()
-      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
+      if (!result) throw { status: 404, message: `This ressource doesn't exist` }
       return result
     },
   }),
@@ -88,7 +88,7 @@ const preBuiltRoutes = {
     path: `PUT /${pluralName}/:_id`,
     resolver: async () => {
       const result = await routeCtx.Model.findOne({ _id: req.params._id })
-      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
+      if (!result) throw { status: 404, message: `This ressource doesn't exist` }
       result._old = result.toObject()
       for (let [key, value] of Object.entries(req.body)) {
         result[key] = value
@@ -101,7 +101,7 @@ const preBuiltRoutes = {
     path: `DELETE /${pluralName}/:_id`,
     resolver: async ({ Model, req }) => {
       const result = await Model.findOne({ _id: req.params._id })
-      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
+      if (!result) throw { status: 404, message: `This ressource doesn't exist` }
       await result.remove()
       return result
     },
@@ -122,7 +122,7 @@ const preBuiltRoutes = {
 //     router.get(`/${routeCtx.pluralName}/mine`, (req, res) => {
 //       routeWrapper(routeCtx, req, res, async () => {
 //         const result = await routeCtx.Model.findOne({ user: req.myId })
-//         // if (!result) throw { status: 404, code: `Aucune ressource trouvée` }
+//         // if (!result) throw { status: 404, message: `Aucune ressource trouvée` }
 //         return result
 //       })
 //     })

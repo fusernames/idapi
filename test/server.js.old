@@ -110,7 +110,7 @@ const server = async () => {
       access: 'private',
       resolver: async ({ Model }) => {
         const user = await Model.findOne({ _id: ctx.req.myId })
-        if (!user) throw { status: 404, code: 'Utilisateur introuvable' } // send the response with status as status and code as content
+        if (!user) throw { status: 404, message: 'Utilisateur introuvable' } // send the response with status as status and code as content
         return user // the returning value is sent in json with status code 200
       },
     },
@@ -131,7 +131,7 @@ const server = async () => {
         const user = await ctx.Model.findOne({ _id })
         const match = await bcrypt.compare(password, user.password)
         if (match === false) {
-          throw { status: 403, code: 'Mauvais mot de passe' }
+          throw { status: 403, message: 'Mauvais mot de passe' }
         }
       },
     },
