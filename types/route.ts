@@ -7,7 +7,7 @@ export interface Route {
   before?: (ctx: Ctx) => Promise<void>;
   resolver?: (ctx: Ctx) => Promise<any>;
   after?: (ctx: Ctx, result: any) => Promise<void>;
-  queryMiddleware: (query: any) => Promise<void>
+  queryMiddleware: (query: any, ctx: Ctx) => Promise<void>
   disableRespond?: Boolean
 }
 

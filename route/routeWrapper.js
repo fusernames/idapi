@@ -2,11 +2,7 @@
 // const { Request, Response } = require('express')
 const respond = require('./respond')
 
-const routeWrapper = (
-  { Model, route, idapi },
-  req,
-  res,
-) => {
+const routeWrapper = ({ modelName, route, idapi }, req, res) => {
   respond(
     req,
     res,
@@ -14,7 +10,7 @@ const routeWrapper = (
       const ctx = {
         req,
         res,
-        Model
+        Model: idapi[modelName],
       }
       // access
       // console.log(`[idapi] access ${access}, authorizations: ${authorizations[access]}`)

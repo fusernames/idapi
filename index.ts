@@ -73,8 +73,8 @@ class Idapi {
     return this.validators[name]
   }
 
-  routes(name: string, routes: Routes) {
-    this.app.use(generateRoutes(name, routes, this))
+  routes(modelName: string | null, routes: Routes) {
+    this.app.use(generateRoutes(modelName, routes, this))
   }
 }
 

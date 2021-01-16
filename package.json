@@ -15,7 +15,8 @@
     "joi": "^17.2.0",
     "mongoose": "^5.11.0",
     "mongoose-query-parser": "^1.1.9",
-    "pluralize": "^8.0.0"
+    "pluralize": "^8.0.0",
+    "query-string": "^6.13.8"
   },
   "devDependencies": {
     "@types/joi": "^14.3.4",
