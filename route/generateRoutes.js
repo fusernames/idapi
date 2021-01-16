@@ -29,15 +29,15 @@ module.exports = (modelName, routes, idapi) => {
       route,
       idapi,
     }
-    const [method, realPath] = path.toLowerCase().split(' ')
+    const [method, realPath] = path.split(' ')
     const logs = [
       chalk.bold.blue('[idapi]'),
-      `created ${path}`,
+      `created "${path}"`,
       modelName ? `for ${chalk.magenta(modelName)}` : undefined,
-      preBuiltName ? chalk.green(`(${preBuiltName})`) : undefined,
+      preBuiltName ? chalk.green(`(generated with ${preBuiltName})`) : undefined,
     ]
     console.log(logs.filter((x) => Boolean(x)).join(' '))
-    router[method](realPath, async (req, res) => {
+    router[method.toLowerCase()](realPath, async (req, res) => {
       routeWrapper(routeCtx, req, res)
     })
   }
@@ -60,7 +60,7 @@ const preBuiltRoutes = {
         await route.queryMiddleware(mainQuery)
       }
       const result = await mainQuery.exec()
-      if (!result) throw { status: 404, code: `La ressource n'existe pas` }
+      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
       return result
     },
   }),
@@ -88,7 +88,7 @@ const preBuiltRoutes = {
     path: `PUT /${pluralName}/:_id`,
     resolver: async () => {
       const result = await routeCtx.Model.findOne({ _id: req.params._id })
-      if (!result) throw { status: 404, code: `La ressource n'existe pas` }
+      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
       result._old = result.toObject()
       for (let [key, value] of Object.entries(req.body)) {
         result[key] = value
@@ -98,10 +98,10 @@ const preBuiltRoutes = {
     },
   }),
   $delete: (pluralName) => ({
-    path: `PUT /${pluralName}/:_id`,
+    path: `DELETE /${pluralName}/:_id`,
     resolver: async ({ Model, req }) => {
       const result = await Model.findOne({ _id: req.params._id })
-      if (!result) throw { status: 404, code: `La ressource n'existe pas` }
+      if (!result) throw { status: 404, code: `This ressource doesn't exist` }
       await result.remove()
       return result
     },
