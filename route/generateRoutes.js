@@ -55,7 +55,9 @@ const preBuiltRoutes = {
   $get: (pluralName, route) => ({
     path: `GET /${pluralName}/:_id`,
     resolver: async ({ Model, req }) => {
-      let mainQuery = Model.findOne({ _id: req.params._id })
+      const urlQuery = queryString.stringify(req.query)
+      const { filter } = urlQuery ? parser.parse(urlQuery) : {}
+      let mainQuery = Model.findOne({ ...filter, _id: req.params._id })
       if (route.queryMiddleware) {
         await route.queryMiddleware(mainQuery)
       }
@@ -86,8 +88,8 @@ const preBuiltRoutes = {
   }),
   $put: (pluralName, route) => ({
     path: `PUT /${pluralName}/:_id`,
-    resolver: async () => {
-      const result = await routeCtx.Model.findOne({ _id: req.params._id })
+    resolver: async ({ req, Model }) => {
+      const result = await Model.findOne({ _id: req.params._id })
       if (!result) throw { status: 404, message: `This ressource doesn't exist` }
       result._old = result.toObject()
       for (let [key, value] of Object.entries(req.body)) {

@@ -17,7 +17,7 @@ const routeWrapper = ({ modelName, route, idapi }, req, res) => {
       if (route.access) {
         const accessFn = typeof route.access == 'string' ? idapi.authorizations[route.access] : route.access
         const accessGranted = await accessFn({ access: route.access, req })
-        if (!accessGranted) throw { status: 403, message: 'Non autorisé' }
+        if (!accessGranted) throw { status: 403, message: 'Unauthorized' }
       }
       // model
       // before
